@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Castle.DynamicProxy;
 
-namespace F4St.Common.Containers
+namespace F4ST.Common.Containers
 {
     public class LoggingMethodInterceptor : BaseInterceptorASync
     {

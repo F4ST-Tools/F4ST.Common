@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Common library for F4ST</Description>
     <Product>F4ST</Product>
-    <version>1.0.2</version>
+    <version>1.0.5</version>
     <Authors>https://github.com/nRafinia</Authors>
     <Company>https://github.com/nRafinia/F4ST.Common</Company>
     <License>https://opensource.org/licenses/AGPL-3.0</License>
@@ -24,6 +24,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.1" />
     <PackageReference Include="RestSharp" Version="106.10.1" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
     <PackageReference Include="System.Reflection.DispatchProxy" Version="4.3.0" />
   </ItemGroup>
 

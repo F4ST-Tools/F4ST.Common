@@ -1,7 +1,7 @@
 ﻿using System;
 using Mapster;
 
-namespace F4St.Common.Mappers
+namespace F4ST.Common.Mappers
 {
     public interface IMapper
     {

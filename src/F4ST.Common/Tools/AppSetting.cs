@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 
-namespace F4St.Common.Tools
+namespace F4ST.Common.Tools
 {
     public class AppSetting : IAppSetting
     {

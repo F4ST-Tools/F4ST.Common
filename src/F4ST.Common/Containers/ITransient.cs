@@ -1,4 +1,4 @@
-﻿namespace F4St.Common.Containers
+﻿namespace F4ST.Common.Containers
 {
     public interface ITransient
     {

@@ -2,9 +2,9 @@
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.MsDependencyInjection;
-using F4St.Common.Mappers;
+using F4ST.Common.Mappers;
 
-namespace F4St.Common.Containers
+namespace F4ST.Common.Containers
 {
     public class IoC : WindsorServiceProviderFactory
     {

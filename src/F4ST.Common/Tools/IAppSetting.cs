@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using F4St.Common.Containers;
+using F4ST.Common.Containers;
 
-namespace F4St.Common.Tools
+namespace F4ST.Common.Tools
 {
     public interface IAppSetting : ISingleton
     {

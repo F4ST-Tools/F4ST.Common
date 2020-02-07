@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using RestSharp;
 
-namespace F4St.Common.Tools
+namespace F4ST.Common.Tools
 {
     public interface IGlobals
     {

@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace F4St.Common.Tools
+namespace F4ST.Common.Tools
 {
     public abstract class BaseProxy<T, TP> : DispatchProxy
         where T : class
