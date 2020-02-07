@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Common library for F4ST</Description>
+    <Product>F4ST</Product>
+    <Authors>https://github.com/nRafinia</Authors>
+    <Company>https://github.com/nRafinia/F4ST.Common</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Containers\IoCExtension.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Castle.Windsor.MsDependencyInjection" Version="3.3.1" />
+    <PackageReference Include="Mapster" Version="4.1.1" />
+    <PackageReference Include="RestSharp" Version="106.10.1" />
+  </ItemGroup>
+
+</Project>
