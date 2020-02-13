@@ -57,7 +57,7 @@ namespace F4ST.Common.Containers
         public static void Install()
         {
             var installers = Globals.GetImplementedInterfaceOf<IIoCInstaller>();
-            Install(installers.ToArray());
+            Install(installers.OrderBy(o => o.Priority).ToArray());
         }
 
         public static T Resolve<T>(string name)

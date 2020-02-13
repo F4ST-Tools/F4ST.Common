@@ -7,6 +7,7 @@ namespace F4ST.Common.Containers
 {
     public interface IIoCInstaller
     {
+        int Priority { get; }
         void Install(WindsorContainer container, IMapper mapper);
     }
 }
