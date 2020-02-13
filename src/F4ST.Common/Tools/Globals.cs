@@ -9,12 +9,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using F4ST.Common.Extensions;
+using Microsoft.Extensions.DependencyModel;
 using Newtonsoft.Json;
 using RestSharp;
 
 namespace F4ST.Common.Tools
 {
-    public class Globals : IGlobals
+    public static class Globals
     {
         private static readonly HttpClient _httpClient;
 
@@ -23,7 +24,7 @@ namespace F4ST.Common.Tools
             _httpClient = new HttpClient();
         }
 
-        public async Task<string> RequestUrl(string baseUrl, string path, Method method, object postData = null,
+        public static async Task<string> RequestUrl(string baseUrl, string path, Method method, object postData = null,
             Dictionary<string, string> headers = null, int timeout = 10_000, ContentType contentType = ContentType.Json/*,
             CancellationToken cancellationToken = default(CancellationToken)*/)
         {
@@ -157,7 +158,7 @@ namespace F4ST.Common.Tools
             return retValue;
         }
 
-        public async Task<T> RequestUrl<T>(string baseUrl, string path, Method method, object postData = null,
+        public static async Task<T> RequestUrl<T>(string baseUrl, string path, Method method, object postData = null,
             Dictionary<string, string> headers = null, int timeout = 10_000, ContentType contentType = ContentType.Json/*,
             CancellationToken cancellationToken = default*/)
         {
@@ -175,20 +176,20 @@ namespace F4ST.Common.Tools
         public static IEnumerable<T> GetImplementedInterfaceOf<T>()
         {
             var res = new List<T>();
-            var ass = Assembly.GetEntryAssembly();
 
-            if (ass == null)
-                return res;
+            var platform = Environment.OSVersion.Platform.ToString();
+            var runtimeAssemblyNames = DependencyContext.Default.GetRuntimeAssemblyNames(platform);
 
-            foreach (var ti in ass.DefinedTypes)
+            var items = runtimeAssemblyNames
+                .Select(Assembly.Load)
+                .SelectMany(a => a.ExportedTypes)
+                .Where(t => typeof(T).IsAssignableFrom(t));
+
+            foreach (var item in items)
             {
-                if (ti == null)
+                if (item.IsInterface)
                     continue;
-
-                if (ti.ImplementedInterfaces.Contains(typeof(T)))
-                {
-                    res.Add((T)ass.CreateInstance(ti.FullName));
-                }
+                res.Add((T)Activator.CreateInstance(item));
             }
 
             return res;

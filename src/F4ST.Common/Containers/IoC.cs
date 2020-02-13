@@ -1,8 +1,12 @@
-﻿using Castle.DynamicProxy;
+﻿using System;
+using System.Collections;
+using System.Linq;
+using Castle.DynamicProxy;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.MsDependencyInjection;
 using F4ST.Common.Mappers;
+using F4ST.Common.Tools;
 
 namespace F4ST.Common.Containers
 {
@@ -50,9 +54,28 @@ namespace F4ST.Common.Containers
 
         }
 
+        public static void Install()
+        {
+            var installers = Globals.GetImplementedInterfaceOf<IIoCInstaller>();
+            Install(installers.ToArray());
+        }
+
+        public static T Resolve<T>(string name)
+        {
+            return string.IsNullOrEmpty(name)
+                ? Container.Resolve<T>()
+                : Container.Resolve<T>(name);
+        }
+
+        public static T Resolve<T>(string name, object arguments)
+        {
+            return Container.Resolve<T>(name, arguments);
+        }
+
+
         public static T Resolve<T>()
         {
-            return Container.Resolve<T>();
+            return Resolve<T>("");
         }
 
 

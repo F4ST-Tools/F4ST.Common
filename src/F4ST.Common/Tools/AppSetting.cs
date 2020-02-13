@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -19,11 +20,11 @@ namespace F4ST.Common.Tools
 
         #region Internal setting cacche
 
-        private T GetCacheItem<T>(string section)
+        private object GetCacheItem(string section)
         {
-            if (_internalCache.ContainsKey(section))
-                return (T) _internalCache[section];
-            return default(T);
+            return _internalCache.ContainsKey(section)
+                ? _internalCache[section]
+                : null;
         }
 
         private void AddToCache<T>(string section, T item)
@@ -52,7 +53,7 @@ namespace F4ST.Common.Tools
             var res = string.Empty;
             if (!forceUpdate)
             {
-                res = GetCacheItem<string>(section);
+                res = GetCacheItem(section) as string;
             }
 
             if (!forceUpdate && !string.IsNullOrWhiteSpace(res))
@@ -66,7 +67,7 @@ namespace F4ST.Common.Tools
 
         public Dictionary<string, string> GetSettings(string section, bool forceUpdate = false)
         {
-            var res = GetCacheItem<Dictionary<string, string>>(section);
+            var res = GetCacheItem(section) as Dictionary<string, string>;
 
             if (!forceUpdate && res != null)
                 return res;
@@ -81,10 +82,10 @@ namespace F4ST.Common.Tools
 
         public T Get<T>(string section, bool forceUpdate = false)
         {
-            T res = default;
+            /*T res = default;
             if (!forceUpdate)
             {
-                res = GetCacheItem<T>(section);
+                res = (T)GetCacheItem(section);
             }
 
             if (!forceUpdate && res != null)
@@ -92,6 +93,25 @@ namespace F4ST.Common.Tools
 
             var str = _configuration.GetSection(section);
             res = str.Get<T>();
+
+            AddToCache(section, res);*/
+
+            return (T)Get(typeof(T), section, forceUpdate);
+        }
+
+        public object Get(Type type, string section, bool forceUpdate = false)
+        {
+            object res = null;
+            if (!forceUpdate)
+            {
+                res = GetCacheItem(section);
+            }
+
+            if (!forceUpdate && res != null)
+                return res;
+
+            var str = _configuration.GetSection(section);
+            res = str.Get(type);
 
             AddToCache(section, res);
 
