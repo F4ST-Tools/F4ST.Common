@@ -49,7 +49,9 @@ namespace F4ST.Common.Extensions
 
         public static bool IsIEnumerable(this Type o)
         {
-            return o.IsGenericType && o.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+            return o.IsGenericType && 
+                   (o.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+                    o.GetInterface("IEnumerable") != null);
         }
 
         public static Array ConvertToArray<T>(this IEnumerable<T> obj, Type destType)
@@ -138,7 +140,7 @@ namespace F4ST.Common.Extensions
             }
         }
 
-        private static object SetPropertyValue(object src, string propName, object value)
+        public static object SetPropertyValue(object src, string propName, object value)
         {
             if (src == null) //throw new ArgumentException("Value cannot be null.", "src");
                 return value;
@@ -164,7 +166,7 @@ namespace F4ST.Common.Extensions
         public static TValue GetPropertyValue<T, TValue>(this T target, Expression<Func<T, TValue>> memberLamda)
         {
             if (!(memberLamda.Body is MemberExpression memberSelectorExpression))
-                return default(TValue);
+                return default;
 
             var property = memberSelectorExpression.Member as PropertyInfo;
             if (property != null)
@@ -175,10 +177,20 @@ namespace F4ST.Common.Extensions
                 return (TValue)value;
             }
 
-            return default(TValue);
+            return default;
         }
 
-        private static object GetPropertyValue(object src, string propName)
+        public static TValue GetPropertyValue<T, TValue>(this T target, string propName)
+        {
+            if (string.IsNullOrWhiteSpace(propName))
+                return default;
+
+            var value = GetPropertyValue(target, propName);
+
+            return (TValue)value;
+        }
+
+        public static object GetPropertyValue(object src, string propName)
         {
             if (src == null) //throw new ArgumentException("Value cannot be null.", "src");
                 return null;
@@ -222,6 +234,89 @@ namespace F4ST.Common.Extensions
             }
 
             return isValid;
+        }
+
+        public static IEnumerable<T> ToIEnumerable<T>(this IEnumerable source)
+        {
+            // Note: firstItem parameter is unused and is just for resolving type of T
+            foreach (var item in source)
+            {
+                yield return (T)item;
+            }
+        }
+
+        public static string PropertyName<T>(this Expression<Func<T>> expression)
+        {
+            var propertyInfo = (expression.Body as MemberExpression)?.Member as PropertyInfo;
+            if (propertyInfo == null)
+            {
+                throw new ArgumentException("The lambda expression 'property' should point to a valid Property");
+            }
+            return propertyInfo.Name;
+        }
+
+        // code adjusted to prevent horizontal overflow
+        public static string PropertyName<T, TProperty>(this Expression<Func<T, TProperty>> exp)
+        {
+            if (!TryFindMemberExpression(exp.Body, out var memberExp))
+                return string.Empty;
+
+            var memberNames = new Stack<string>();
+            do
+            {
+                memberNames.Push(memberExp.Member.Name);
+            }
+            while (TryFindMemberExpression(memberExp.Expression, out memberExp));
+
+            return string.Join(".", memberNames.ToArray());
+        }
+
+        // code adjusted to prevent horizontal overflow
+        private static bool TryFindMemberExpression(Expression exp, out MemberExpression memberExp)
+        {
+            memberExp = exp as MemberExpression;
+            if (memberExp != null)
+            {
+                // heyo! that was easy enough
+                return true;
+            }
+
+            // if the compiler created an automatic conversion,
+            // it'll look something like...
+            // obj => Convert(obj.Property) [e.g., int -> object]
+            // OR:
+            // obj => ConvertChecked(obj.Property) [e.g., int -> long]
+            // ...which are the cases checked in IsConversion
+            if (IsConversion(exp) && exp is UnaryExpression expression)
+            {
+                memberExp = expression.Operand as MemberExpression;
+                if (memberExp != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsConversion(Expression exp)
+        {
+            return (
+                exp.NodeType == ExpressionType.Convert ||
+                exp.NodeType == ExpressionType.ConvertChecked
+            );
+        }
+
+        public static Expression<Func<TModel, TToProperty>> Cast<TModel, TFromProperty, TToProperty>(this Expression<Func<TModel, TFromProperty>> expression)
+        {
+            Expression converted = Expression.Convert(expression.Body, typeof(TToProperty));
+
+            return Expression.Lambda<Func<TModel, TToProperty>>(converted, expression.Parameters);
+        }
+
+        public static Expression GetExpression<T>(this Expression<Func<T, bool>> exp)
+        {
+            return exp;
         }
 
 
