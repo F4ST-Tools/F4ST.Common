@@ -49,7 +49,9 @@ namespace F4ST.Common.Extensions
 
         public static bool IsIEnumerable(this Type o)
         {
-            return o.IsGenericType && o.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+            return o.IsGenericType && 
+                   (o.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+                    o.GetInterface("IEnumerable") != null);
         }
 
         public static Array ConvertToArray<T>(this IEnumerable<T> obj, Type destType)
@@ -164,7 +166,7 @@ namespace F4ST.Common.Extensions
         public static TValue GetPropertyValue<T, TValue>(this T target, Expression<Func<T, TValue>> memberLamda)
         {
             if (!(memberLamda.Body is MemberExpression memberSelectorExpression))
-                return default(TValue);
+                return default;
 
             var property = memberSelectorExpression.Member as PropertyInfo;
             if (property != null)
@@ -175,10 +177,20 @@ namespace F4ST.Common.Extensions
                 return (TValue)value;
             }
 
-            return default(TValue);
+            return default;
         }
 
-        private static object GetPropertyValue(object src, string propName)
+        public static TValue GetPropertyValue<T, TValue>(this T target, string propName)
+        {
+            if (string.IsNullOrWhiteSpace(propName))
+                return default;
+
+            var value = GetPropertyValue(target, propName);
+
+            return (TValue)value;
+        }
+
+        public static object GetPropertyValue(object src, string propName)
         {
             if (src == null) //throw new ArgumentException("Value cannot be null.", "src");
                 return null;
@@ -224,6 +236,13 @@ namespace F4ST.Common.Extensions
             return isValid;
         }
 
-
+        public static IEnumerable<T> ToIEnumerable<T>(this IEnumerable source)
+        {
+            // Note: firstItem parameter is unused and is just for resolving type of T
+            foreach (var item in source)
+            {
+                yield return (T)item;
+            }
+        }
     }
 }
