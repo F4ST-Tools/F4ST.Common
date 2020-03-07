@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using Newtonsoft.Json;
 
 namespace F4ST.Common.Extensions
@@ -319,6 +321,24 @@ namespace F4ST.Common.Extensions
             return exp;
         }
 
+        public static string ToBase64(this object obj)
+        {
+            using (var ms = new MemoryStream())
+            {
+                new BinaryFormatter().Serialize(ms, obj);
+                return Convert.ToBase64String(ms.ToArray());
+            }
+        }
 
+        public static T ToObject<T>(this string base64String)
+        {
+            var bytes = Convert.FromBase64String(base64String);
+            using (var ms = new MemoryStream(bytes, 0, bytes.Length))
+            {
+                ms.Write(bytes, 0, bytes.Length);
+                ms.Position = 0;
+                return (T)new BinaryFormatter().Deserialize(ms);
+            }
+        }
     }
 }
