@@ -332,13 +332,25 @@ namespace F4ST.Common.Extensions
 
         public static T ToObject<T>(this string base64String)
         {
+            return (T)ToObject(base64String, typeof(T));
+        }
+
+        public static object ToObject(this string base64String)
+        {
+            return ToObject(base64String, typeof(object));
+        }
+
+        public static object ToObject(this string base64String, Type type)
+        {
             var bytes = Convert.FromBase64String(base64String);
             using (var ms = new MemoryStream(bytes, 0, bytes.Length))
             {
                 ms.Write(bytes, 0, bytes.Length);
                 ms.Position = 0;
-                return (T)new BinaryFormatter().Deserialize(ms);
+                var res= new BinaryFormatter().Deserialize(ms);
+                return Convert.ChangeType(res, type);
             }
         }
+
     }
 }
