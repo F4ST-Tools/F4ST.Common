@@ -15,8 +15,15 @@ namespace F4ST.Common.Extensions
         {
             using (var md5 = MD5.Create())
             {
-                var result = md5.ComputeHash(Encoding.ASCII.GetBytes(text));
-                return Encoding.ASCII.GetString(result);
+                var hashBytes = md5.ComputeHash(Encoding.ASCII.GetBytes(text));
+
+                // Convert the byte array to hexadecimal string
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("X2"));
+                }
+                return sb.ToString();
             }
         }
 

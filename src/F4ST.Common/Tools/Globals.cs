@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
@@ -150,9 +151,9 @@ namespace F4ST.Common.Tools
                 retValue = await res.Content.ReadAsStringAsync();
 
             }
-            catch
+            catch(Exception e)
             {
-                //
+                Debugger.Log(1, "F4ST.Common", e.Message);
             }
 
             return retValue;
