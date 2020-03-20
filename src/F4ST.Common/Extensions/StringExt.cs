@@ -125,5 +125,10 @@ namespace F4ST.Common.Extensions
         public static string SubStr(this string value, int startIndex, int endIndex)=>
             value.Substring(startIndex, (endIndex - startIndex + 1));
 
+        public static string FromBytes(this byte[] input)
+        {
+            return Encoding.Default.GetString(input);
+        }
+
     }
 }
