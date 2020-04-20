@@ -151,7 +151,7 @@ namespace F4ST.Common.Tools
                 retValue = await res.Content.ReadAsStringAsync();
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debugger.Log(1, "F4ST.Common", e.Message);
             }
@@ -194,6 +194,25 @@ namespace F4ST.Common.Tools
             }
 
             return res;
+        }
+
+        /// <summary>
+        /// Get class type with Attribute
+        /// </summary>
+        /// <typeparam name="T">Attribute</typeparam>
+        /// <returns>List of class types</returns>
+        public static IEnumerable<Type> GetClassTypeWithAttribute<T>()
+            where T : Attribute
+        {
+            var platform = Environment.OSVersion.Platform.ToString();
+            var runtimeAssemblyNames = DependencyContext.Default.GetRuntimeAssemblyNames(platform);
+
+            var items = runtimeAssemblyNames
+                .Select(Assembly.Load)
+                .SelectMany(a => a.ExportedTypes)
+                .Where(t => t.GetCustomAttributes<T>().Any());
+
+            return items;
         }
 
         /// <summary>
